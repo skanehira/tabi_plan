@@ -1,0 +1,7 @@
+target
+infra
+.git
+.dockerignore
+LICENSE
+**.md
+.github

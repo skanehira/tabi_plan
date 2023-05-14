@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tabiplan
+spec:
+  selector:
+    matchLabels:
+      app: tabiplan
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: tabiplan
+    spec:
+      containers:
+      - name: tabiplan
+        image: okteto.dev/tabiplan:latest
+        ports:
+        - containerPort: 8080
