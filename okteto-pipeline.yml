@@ -1,0 +1,3 @@
+deploy:
+  - okteto build --platform=linux/amd64 -t okteto.dev/tabi_plan:latest -f infra/Dockerfile
+  - kubectl apply -f infra/manifests
