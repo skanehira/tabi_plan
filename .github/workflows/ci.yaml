@@ -4,9 +4,24 @@ on:
       - main
     paths-ignore:
       - '**.md'
+      - 'Makefile'
+      - '.dockerignore'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'infra/**'
+      - 'okteto-pipeline.yml'
   pull_request:
     paths-ignore:
       - '**.md'
+      - 'Makefile'
+      - '.dockerignore'
+      - '.gitignore'
+      - 'LICENSE'
+      - 'infra/**'
+      - 'okteto-pipeline.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   lint:
     runs-on: ubuntu-latest
