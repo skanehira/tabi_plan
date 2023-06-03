@@ -5,6 +5,7 @@
 - [Okteto CLI](https://www.okteto.com/docs/getting-started/#installing-okteto-cli)
 - Docker
 - Rust 1.69
+- [cargo-make](https://github.com/sagiegurari/cargo-make)
 
 ## Preparation
 - Prepare API Key that ChatGPT
@@ -14,10 +15,10 @@
 
 Run API Srever
 ```sh
-$ make run
+$ makers run
 ```
 
 Build docker image and push Okteto.dev's registry
 ```sh
-$ make image-build
+$ makers image-build
 ```
