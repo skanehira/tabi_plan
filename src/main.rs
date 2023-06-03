@@ -2,6 +2,7 @@ mod auth;
 mod client;
 mod config;
 mod error;
+mod input;
 mod output;
 mod routes;
 mod spots;
