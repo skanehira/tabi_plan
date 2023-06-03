@@ -1,5 +1,9 @@
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use tokio::signal;
+mod routes;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -12,10 +16,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         String::from_utf8(output)?.trim().to_string()
     };
 
-    let app = Router::new().route(
-        "/",
-        get(move || async move { format!("Hello, {}!\n", host) }),
-    );
+    let app = Router::new()
+        .route(
+            "/",
+            get(move || async move { format!("Hello, {}!\n", host) }),
+        )
+        .route("/routes", post(routes::handler));
 
     eprintln!("server start");
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
