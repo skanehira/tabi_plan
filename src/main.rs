@@ -1,8 +1,14 @@
+mod config;
+
 use axum::{routing::get, Router};
+use clap::Parser as _;
+use std::sync::Arc;
 use tokio::signal;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> anyhow::Result<()> {
+    let config = config::AppConfig::try_parse()?;
+
     #[cfg(target_os = "linux")]
     let host = std::env::var("HOSTNAME")?;
 
@@ -16,6 +22,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "/",
         get(move || async move { format!("Hello, {}!\n", host) }),
     );
+
+    let app = app.with_state(Arc::new(config));
 
     eprintln!("server start");
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
