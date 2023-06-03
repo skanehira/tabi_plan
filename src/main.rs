@@ -1,9 +1,6 @@
 mod config;
 
-use axum::{
-    routing::{get, post},
-    Router,
-};
+use axum::{routing::post, Router};
 use clap::Parser as _;
 use std::sync::Arc;
 use tokio::signal;
@@ -13,21 +10,7 @@ mod routes;
 async fn main() -> anyhow::Result<()> {
     let config = config::AppConfig::try_parse()?;
 
-    #[cfg(target_os = "linux")]
-    let host = std::env::var("HOSTNAME")?;
-
-    #[cfg(target_os = "macos")]
-    let host = {
-        let output = std::process::Command::new("hostname").output()?.stdout;
-        String::from_utf8(output)?.trim().to_string()
-    };
-
-    let app = Router::new()
-        .route(
-            "/",
-            get(move || async move { format!("Hello, {}!\n", host) }),
-        )
-        .route("/routes", post(routes::handler));
+    let app = Router::new().route("/routes", post(routes::handler));
 
     let app = app.with_state(Arc::new(config));
 
