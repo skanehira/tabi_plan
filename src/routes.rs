@@ -1,7 +1,11 @@
-use crate::{config::AppState, error::AppError, output::map::Directions};
+use crate::{
+    config::AppState,
+    error::AppError,
+    input::routes::Input,
+    output::{map::Directions, routes::Output},
+};
 use axum::{extract::State, response::Json};
 use reqwest::Url;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 pub async fn get_routes(
@@ -41,39 +45,4 @@ pub async fn get_routes(
         google_map_url: url,
     };
     Ok(Json(resp))
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Input {
-    pub origin: String,
-    pub destination: String,
-    pub waypoints: Vec<String>,
-    pub travel_mode: TravelMode,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Output {
-    pub google_map_url: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Place {
-    pub place: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub enum TravelMode {
-    #[serde(rename = "walking")]
-    Walking,
-    #[serde(rename = "driving")]
-    Driving,
-}
-
-impl ToString for TravelMode {
-    fn to_string(&self) -> String {
-        match self {
-            TravelMode::Walking => "walking".to_string(),
-            TravelMode::Driving => "driving".to_string(),
-        }
-    }
 }

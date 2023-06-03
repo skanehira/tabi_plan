@@ -1,9 +1,8 @@
-use crate::{config::AppState, error::AppError};
+use crate::{config::AppState, error::AppError, input::spots::Input, output::spots::Output};
 use anyhow::anyhow;
 use axum::extract::State;
 use axum::response::Json;
 use once_cell::sync::Lazy;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 static PREFECTURES: Lazy<Vec<&str>> = Lazy::new(|| {
@@ -87,15 +86,4 @@ pub async fn get_spots(
 fn is_valid_prefecture(area: &str) -> bool {
     let area = area.replace(['都', '府', '県'], "");
     PREFECTURES.contains(&area.as_str())
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Input {
-    pub area: String,
-    pub candidate_count: u8,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Output {
-    pub places: Vec<String>,
 }

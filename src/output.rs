@@ -1,6 +1,26 @@
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+pub mod spots {
+    use super::*;
+
+    #[derive(Debug, Deserialize, Serialize)]
+    pub struct Output {
+        pub places: Vec<String>,
+    }
+}
+
+pub mod routes {
+    use super::*;
+
+    #[derive(Debug, Deserialize, Serialize)]
+    pub struct Output {
+        pub google_map_url: String,
+    }
+}
+
 pub mod map {
-    use serde::{Deserialize, Serialize};
-    use serde_json::Value;
+    use super::*;
 
     #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
     #[serde(rename_all = "camelCase")]
