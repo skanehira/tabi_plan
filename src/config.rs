@@ -3,13 +3,13 @@ use clap::Parser;
 #[derive(Parser, Debug)]
 pub struct AppConfig {
     #[command(flatten)]
-    basic: BasicAuth,
+    pub basic: BasicAuth,
 
     #[command(flatten)]
-    open_chat: OpenChatConfig,
+    pub open_chat: OpenChatConfig,
 
     #[command(flatten)]
-    google_map: GoogleMapConfig,
+    pub google_map: GoogleMapConfig,
 }
 
 // TODO: 履歴を持つ場合はユーザ情報はDBで管理する

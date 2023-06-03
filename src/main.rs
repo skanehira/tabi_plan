@@ -1,18 +1,25 @@
+mod auth;
 mod config;
+mod routes;
 
-use axum::{routing::post, Router};
+use axum::{middleware, routing::post, Router};
 use clap::Parser as _;
 use std::sync::Arc;
 use tokio::signal;
-mod routes;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let config = config::AppConfig::try_parse()?;
+    let config = Arc::new(config);
 
     let app = Router::new().route("/routes", post(routes::handler));
 
-    let app = app.with_state(Arc::new(config));
+    let app = app
+        .with_state(Arc::clone(&config))
+        .layer(middleware::from_fn_with_state(
+            config,
+            auth::auth_middleware,
+        ));
 
     eprintln!("server start");
     axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
