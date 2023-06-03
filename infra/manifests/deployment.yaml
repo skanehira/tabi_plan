@@ -16,4 +16,32 @@ spec:
       - name: tabiplan
         image: okteto.dev/tabiplan:latest
         ports:
-        - containerPort: 8080
+          - containerPort: 8080
+        env:
+          # basic 認証
+          - name: BASIC_USER
+            valueFrom:
+              secretKeyRef:
+                name: basic-auth
+                key: username
+          - name: BASIC_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: basic-auth
+                key: password
+          # Open Chat API
+          - name: OPEN_CHAT_ENDPOINT
+            value: https://api.openai.com/v1/chat/completions
+          - name: OPEN_CHAT_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: open-chat-api
+                key: token
+          # Google Map API
+          - name: GOOGLE_MAP_ENDPOINT
+            value: https://maps.googleapis.com/maps/api/directions/json
+          - name: GOOGLE_MAP_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: google-map-api
+                key: token
