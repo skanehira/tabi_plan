@@ -1,0 +1,11 @@
+env_files = [
+	".env.local"
+]
+
+[tasks."image-build"]
+command = "okteto"
+args = ["build", "--platform=linux/amd64", "-t" ,"okteto.dev/tabiplan:latest", "-f", "infra/Dockerfile"]
+
+[tasks."run"]
+command = "cargo"
+args = ["run"]
