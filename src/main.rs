@@ -1,9 +1,13 @@
 mod config;
 
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use clap::Parser as _;
 use std::sync::Arc;
 use tokio::signal;
+mod routes;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -18,10 +22,12 @@ async fn main() -> anyhow::Result<()> {
         String::from_utf8(output)?.trim().to_string()
     };
 
-    let app = Router::new().route(
-        "/",
-        get(move || async move { format!("Hello, {}!\n", host) }),
-    );
+    let app = Router::new()
+        .route(
+            "/",
+            get(move || async move { format!("Hello, {}!\n", host) }),
+        )
+        .route("/routes", post(routes::handler));
 
     let app = app.with_state(Arc::new(config));
 
