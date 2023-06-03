@@ -1315,6 +1315,7 @@ dependencies = [
  "axum",
  "chatgpt_rs",
  "clap",
+ "once_cell",
  "reqwest",
  "serde",
  "serde_json",
