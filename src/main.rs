@@ -1,6 +1,7 @@
 mod auth;
 mod config;
 mod routes;
+mod spots;
 
 use axum::{middleware, routing::post, Router};
 use clap::Parser as _;
@@ -12,7 +13,9 @@ async fn main() -> anyhow::Result<()> {
     let config = config::AppConfig::try_parse()?;
     let config = Arc::new(config);
 
-    let app = Router::new().route("/routes", post(routes::handler));
+    let app = Router::new()
+        .route("/spots", post(spots::handler))
+        .route("/routes", post(routes::handler));
 
     let app = app
         .with_state(Arc::clone(&config))
