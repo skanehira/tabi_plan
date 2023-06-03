@@ -17,6 +17,7 @@ pub struct AppConfig {
 pub struct AppState {
     pub config: AppConfig,
     pub chat_gpt_client: ChatGPT,
+    pub google_map_client: reqwest::Client,
 }
 
 // TODO: 履歴を持つ場合はユーザ情報はDBで管理する

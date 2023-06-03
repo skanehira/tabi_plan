@@ -1,6 +1,8 @@
 mod auth;
+mod client;
 mod config;
 mod error;
+mod output;
 mod routes;
 mod spots;
 
@@ -17,6 +19,7 @@ async fn main() -> anyhow::Result<()> {
     let state = config::AppState {
         config,
         chat_gpt_client: ChatGPT::new(token)?,
+        google_map_client: reqwest::Client::new(),
     };
     let state = Arc::new(state);
 
