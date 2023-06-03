@@ -1,6 +1,7 @@
+use chatgpt::prelude::ChatGPT;
 use clap::Parser;
 
-#[derive(Parser, Debug)]
+#[derive(Clone, Parser, Debug)]
 pub struct AppConfig {
     #[command(flatten)]
     pub basic: BasicAuth,
@@ -10,6 +11,12 @@ pub struct AppConfig {
 
     #[command(flatten)]
     pub google_map: GoogleMapConfig,
+}
+
+#[derive(Clone, Debug)]
+pub struct AppState {
+    pub config: AppConfig,
+    pub chat_gpt_client: ChatGPT,
 }
 
 // TODO: 履歴を持つ場合はユーザ情報はDBで管理する

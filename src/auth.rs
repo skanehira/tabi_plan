@@ -1,4 +1,4 @@
-use crate::config::AppConfig;
+use crate::config::AppState;
 use axum::{
     body::Body,
     extract::{State, TypedHeader},
@@ -22,17 +22,17 @@ macro_rules! unauthorized {
 }
 
 pub async fn auth_middleware<B>(
-    State(config): State<Arc<AppConfig>>,
+    State(state): State<Arc<AppState>>,
     req: Request<B>,
     next: Next<B>,
 ) -> Response {
-    let config = Arc::clone(&config);
     let (mut parts, body) = req.into_parts();
 
     let auth = parts.extract::<TypedHeader<Authorization<Basic>>>().await;
     match auth {
         Ok(auth) => {
-            if auth.username() != config.basic.user_name || auth.password() != config.basic.password
+            if auth.username() != state.config.basic.user_name
+                || auth.password() != state.config.basic.password
             {
                 // invalid user
                 unauthorized!();

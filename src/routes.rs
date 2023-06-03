@@ -1,7 +1,7 @@
 use axum::response::Json;
 use serde::{Deserialize, Serialize};
 
-pub async fn handler(_input: Json<Input>) -> Json<Output> {
+pub async fn get_routes(_input: Json<Input>) -> Json<Output> {
     let resp = Output {
         places: vec![Place {
             place: "< place >".to_string(),
