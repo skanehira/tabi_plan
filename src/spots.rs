@@ -1,3 +1,4 @@
+use crate::client::GoogleMapClient;
 use crate::{config::AppState, error::AppError, input::spots::Input, output::spots::Output};
 use anyhow::anyhow;
 use axum::extract::State;
@@ -57,8 +58,8 @@ static PREFECTURES: Lazy<Vec<&str>> = Lazy::new(|| {
     ]
 });
 
-pub async fn get_spots(
-    State(state): State<Arc<AppState>>,
+pub async fn get_spots<G: GoogleMapClient>(
+    State(state): State<Arc<AppState<G>>>,
     input: Json<Input>,
 ) -> Result<Json<Output>, AppError> {
     if !is_valid_prefecture(input.area.as_str()) {

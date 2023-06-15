@@ -26,7 +26,7 @@ async fn main() -> anyhow::Result<()> {
     let state = config::AppState {
         config,
         chat_gpt_client: ChatGPT::new(token)?,
-        google_map_client: Box::new(google_map_client),
+        google_map_client,
     };
     let state = Arc::new(state);
 

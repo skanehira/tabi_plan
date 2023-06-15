@@ -21,8 +21,8 @@ macro_rules! unauthorized {
     };
 }
 
-pub async fn auth_middleware<B>(
-    State(state): State<Arc<AppState>>,
+pub async fn auth_middleware<B, G>(
+    State(state): State<Arc<AppState<G>>>,
     req: Request<B>,
     next: Next<B>,
 ) -> Response {

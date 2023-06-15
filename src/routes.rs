@@ -1,9 +1,12 @@
-use crate::{config::AppState, error::AppError, input::routes::Input, output::routes::Output};
+use crate::{
+    client::GoogleMapClient, config::AppState, error::AppError, input::routes::Input,
+    output::routes::Output,
+};
 use axum::{extract::State, response::Json};
 use std::sync::Arc;
 
-pub async fn get_routes(
-    State(state): State<Arc<AppState>>,
+pub async fn get_routes<G: GoogleMapClient>(
+    State(state): State<Arc<AppState<G>>>,
     input: Json<Input>,
 ) -> Result<Json<Output>, AppError> {
     let travel_mode = input.travel_mode.to_string();
@@ -72,7 +75,7 @@ mod tests {
         let state = config::AppState {
             config,
             chat_gpt_client: ChatGPT::new(token)?,
-            google_map_client: Box::new(client),
+            google_map_client: client,
         };
 
         let state = Arc::new(state);

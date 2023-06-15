@@ -1,8 +1,6 @@
 use chatgpt::prelude::ChatGPT;
 use clap::Parser;
 
-use crate::client::GoogleMapClient;
-
 #[derive(Clone, Parser, Debug)]
 pub struct AppConfig {
     #[command(flatten)]
@@ -15,10 +13,10 @@ pub struct AppConfig {
     pub google_map: GoogleMapConfig,
 }
 
-pub struct AppState {
+pub struct AppState<G> {
     pub config: AppConfig,
     pub chat_gpt_client: ChatGPT,
-    pub google_map_client: Box<dyn GoogleMapClient>,
+    pub google_map_client: G,
 }
 
 // TODO: 履歴を持つ場合はユーザ情報はDBで管理する
