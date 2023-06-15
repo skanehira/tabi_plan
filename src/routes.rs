@@ -1,11 +1,5 @@
-use crate::{
-    config::AppState,
-    error::AppError,
-    input::routes::Input,
-    output::{map::Directions, routes::Output},
-};
+use crate::{config::AppState, error::AppError, input::routes::Input, output::routes::Output};
 use axum::{extract::State, response::Json};
-use reqwest::Url;
 use std::sync::Arc;
 
 pub async fn get_routes(
@@ -13,19 +7,7 @@ pub async fn get_routes(
     input: Json<Input>,
 ) -> Result<Json<Output>, AppError> {
     let travel_mode = input.travel_mode.to_string();
-    let url = Url::parse_with_params(
-        &state.config.google_map.google_map_endpoint,
-        &[
-            ("origin", &input.origin),
-            ("destination", &input.destination),
-            ("waypoints", &input.waypoints.join("|")),
-            ("mode", &travel_mode),
-            ("key", &state.config.google_map.google_map_api_key),
-        ],
-    )?;
-
-    let req = state.google_map_client.get(url);
-    let dirs: Directions = req.send().await?.json().await?;
+    let dirs = state.google_map_client.routes(input.0).await?;
 
     let legs = &dirs.routes[0].legs;
     let origin = &legs[0].start_address;

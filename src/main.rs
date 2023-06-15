@@ -13,14 +13,20 @@ use clap::Parser as _;
 use std::sync::Arc;
 use tokio::signal;
 
+use crate::client::GoogleMapClientImpl;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let config = config::AppConfig::try_parse()?;
     let token = config.open_chat.open_chat_api_key.clone();
+    let google_map_client = GoogleMapClientImpl::new(
+        reqwest::Client::new(),
+        config.google_map.google_map_api_key.clone(),
+    );
     let state = config::AppState {
         config,
         chat_gpt_client: ChatGPT::new(token)?,
-        google_map_client: reqwest::Client::new(),
+        google_map_client: Box::new(google_map_client),
     };
     let state = Arc::new(state);
 
@@ -31,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
         .layer(middleware::from_fn_with_state(state, auth::auth_middleware));
 
     eprintln!("server start");
-    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:8083".parse().unwrap())
         .serve(app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .await?;
