@@ -32,7 +32,9 @@ pub async fn get_routes(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{config, input::routes::TravelMode};
+    use crate::{
+        client::GoogleMapClient, config, input::routes::TravelMode, output::map::Directions,
+    };
     use axum::{
         body::Body,
         http::{self, Request, StatusCode},
@@ -42,16 +44,37 @@ mod tests {
     use clap::Parser as _;
     use tower::ServiceExt;
 
+    struct MockGoogleMapClient {
+        directions: Option<Directions>,
+        error: Option<AppError>,
+    }
+
+    #[async_trait::async_trait]
+    impl GoogleMapClient for MockGoogleMapClient {
+        async fn routes(&self, _: Input) -> Result<Directions, AppError> {
+            match (&self.directions, &self.error) {
+                (Some(directions), None) => Ok(directions.clone()),
+                (None, Some(_)) => Err(AppError(anyhow::anyhow!("error"))),
+                _ => unreachable!(),
+            }
+        }
+    }
     #[tokio::test]
     async fn test_get_routes() -> anyhow::Result<()> {
         let config = config::AppConfig::try_parse()?;
         let token = config.open_chat.open_chat_api_key.clone();
-
+        let bytes = include_bytes!("fixtures/directions.json");
+        let directions: Directions = serde_json::from_slice(bytes)?;
+        let client = MockGoogleMapClient {
+            directions: Some(directions),
+            error: None,
+        };
         let state = config::AppState {
             config,
             chat_gpt_client: ChatGPT::new(token)?,
-            google_map_client: reqwest::Client::new(),
+            google_map_client: Box::new(client),
         };
+
         let state = Arc::new(state);
         let app = Router::new()
             .route("/routes", post(get_routes))
@@ -69,6 +92,7 @@ mod tests {
         let req = Request::builder()
             .method(http::Method::POST)
             .uri("/routes")
+            .header(http::header::CONTENT_TYPE, "application/json")
             .body(body)?;
 
         let resp = app.oneshot(req).await?;
