@@ -7,13 +7,12 @@ mod output;
 mod routes;
 mod spots;
 
+use crate::client::GoogleMapClientImpl;
 use axum::{middleware, routing::post, Router};
 use chatgpt::prelude::ChatGPT;
 use clap::Parser as _;
 use std::sync::Arc;
 use tokio::signal;
-
-use crate::client::GoogleMapClientImpl;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

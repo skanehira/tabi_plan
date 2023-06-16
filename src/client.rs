@@ -2,7 +2,7 @@ use crate::{error::AppError, input::routes::Input, output::map::Directions};
 use reqwest::Url;
 
 #[async_trait::async_trait]
-pub trait GoogleMapClient: Sync + Send {
+pub trait GoogleMapClient {
     async fn routes(&self, input: Input) -> Result<Directions, AppError>;
 }
 
