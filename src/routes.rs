@@ -78,7 +78,7 @@ mod tests {
             match (&self.directions, &self.error) {
                 (Some(directions), None) => Ok(directions.clone()),
                 (None, Some(_)) => Err(AppError {
-                    message: "error".into(),
+                    message: "no any directions".into(),
                 }),
                 _ => unreachable!(),
             }
