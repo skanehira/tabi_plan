@@ -1,7 +1,3 @@
-env_files = [
-	".env.local"
-]
-
 [tasks."image-build"]
 command = "okteto"
 args = ["build", "--platform=linux/amd64", "-t" ,"okteto.dev/tabiplan:latest", "-f", "infra/Dockerfile"]
@@ -9,3 +5,8 @@ args = ["build", "--platform=linux/amd64", "-t" ,"okteto.dev/tabiplan:latest", "
 [tasks."run"]
 command = "cargo"
 args = ["run"]
+
+[tasks.test]
+env_files = [
+	".env.test"
+]
