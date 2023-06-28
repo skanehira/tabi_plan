@@ -1,16 +1,18 @@
 use axum::response::IntoResponse;
 use axum::response::Response;
 use reqwest::StatusCode;
+use serde::Deserialize;
+use serde::Serialize;
 
-pub struct AppError(pub anyhow::Error);
+#[derive(Deserialize, Serialize)]
+pub struct AppError {
+    pub message: String,
+}
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!(r#"{{"messaage": "{}"}}"#, self.0),
-        )
-            .into_response()
+        let message = serde_json::to_string(&self).expect("cannot serialize json");
+        (StatusCode::INTERNAL_SERVER_ERROR, message).into_response()
     }
 }
 
@@ -19,6 +21,8 @@ where
     E: Into<anyhow::Error>,
 {
     fn from(err: E) -> Self {
-        Self(err.into())
+        Self {
+            message: err.into().to_string(),
+        }
     }
 }
