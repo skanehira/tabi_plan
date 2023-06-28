@@ -36,12 +36,12 @@ pub async fn get_routes<G: GoogleMapClient>(
 
     let mut queries = vec![
         ("api", "1"),
-        ("origin", &origin),
-        ("destination", &destination),
+        ("origin", origin),
+        ("destination", destination),
         ("mode", &travel_mode),
     ];
 
-    let has_waypoints = waypoints.len() > 0;
+    let has_waypoints = !waypoints.is_empty();
     let waypoints = waypoints.join("|");
     if has_waypoints {
         queries.push(("waypoints", &waypoints));
