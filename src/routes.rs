@@ -57,7 +57,9 @@ mod tests {
         async fn routes(&self, _: Input) -> Result<Directions, AppError> {
             match (&self.directions, &self.error) {
                 (Some(directions), None) => Ok(directions.clone()),
-                (None, Some(_)) => Err(AppError(anyhow::anyhow!("error"))),
+                (None, Some(_)) => Err(AppError {
+                    message: "no any directions".into(),
+                }),
                 _ => unreachable!(),
             }
         }

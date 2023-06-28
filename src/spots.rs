@@ -1,6 +1,5 @@
 use crate::client::GoogleMapClient;
 use crate::{config::AppState, error::AppError, input::spots::Input, output::spots::Output};
-use anyhow::anyhow;
 use axum::extract::State;
 use axum::response::Json;
 use once_cell::sync::Lazy;
@@ -63,7 +62,9 @@ pub async fn get_spots<G: GoogleMapClient>(
     input: Json<Input>,
 ) -> Result<Json<Output>, AppError> {
     if !is_valid_prefecture(input.area.as_str()) {
-        return Err(AppError(anyhow!("該当の都道府県は存在しません")));
+        return Err(AppError {
+            message: "該当の都道府県は存在しません".into(),
+        });
     }
     let mut conversation = state
         .chat_gpt_client
@@ -78,7 +79,9 @@ pub async fn get_spots<G: GoogleMapClient>(
     let response = conversation.send_message(content).await?;
     let message = response.message().content.to_string();
     if message.contains("{\"places\": []}") {
-        return Err(AppError(anyhow!("該当の都道府県は存在しません")));
+        return Err(AppError {
+            message: "該当の都道府県は存在しません".into(),
+        });
     }
     let output: Output = serde_json::from_str(message.as_str())?;
     Ok(Json(output))
