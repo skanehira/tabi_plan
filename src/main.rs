@@ -36,7 +36,7 @@ async fn main() -> anyhow::Result<()> {
         .layer(middleware::from_fn_with_state(state, auth::auth_middleware));
 
     eprintln!("server start");
-    axum::Server::bind(&"0.0.0.0:8083".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
         .serve(app.into_make_service())
         .with_graceful_shutdown(shutdown_signal())
         .await?;
