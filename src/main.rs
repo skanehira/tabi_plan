@@ -7,6 +7,7 @@ mod output;
 mod routes;
 mod spots;
 
+use crate::client::GoogleMapClientImpl;
 use axum::{middleware, routing::post, Router};
 use chatgpt::prelude::ChatGPT;
 use clap::Parser as _;
@@ -17,10 +18,14 @@ use tokio::signal;
 async fn main() -> anyhow::Result<()> {
     let config = config::AppConfig::try_parse()?;
     let token = config.open_chat.open_chat_api_key.clone();
+    let google_map_client = GoogleMapClientImpl::new(
+        reqwest::Client::new(),
+        config.google_map.google_map_api_key.clone(),
+    );
     let state = config::AppState {
         config,
         chat_gpt_client: ChatGPT::new(token)?,
-        google_map_client: reqwest::Client::new(),
+        google_map_client,
     };
     let state = Arc::new(state);
 

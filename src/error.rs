@@ -1,6 +1,7 @@
 use axum::response::IntoResponse;
 use axum::response::Response;
 use reqwest::StatusCode;
+
 pub struct AppError(pub anyhow::Error);
 
 impl IntoResponse for AppError {

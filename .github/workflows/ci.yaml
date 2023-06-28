@@ -3,22 +3,22 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'
-      - 'Makefile'
-      - '.dockerignore'
-      - '.gitignore'
-      - 'LICENSE'
-      - 'infra/**'
-      - 'okteto-pipeline.yml'
+      - "**.md"
+      - "Makefile"
+      - ".dockerignore"
+      - ".gitignore"
+      - "LICENSE"
+      - "infra/**"
+      - "okteto-pipeline.yml"
   pull_request:
     paths-ignore:
-      - '**.md'
-      - 'Makefile'
-      - '.dockerignore'
-      - '.gitignore'
-      - 'LICENSE'
-      - 'infra/**'
-      - 'okteto-pipeline.yml'
+      - "**.md"
+      - "Makefile"
+      - ".dockerignore"
+      - ".gitignore"
+      - "LICENSE"
+      - "infra/**"
+      - "okteto-pipeline.yml"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -45,6 +45,9 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Setup rust toolchain
         uses: dtolnay/rust-toolchain@stable
+      - name: Install binstall
+        run: curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - name: Install cargo-make
+        run: cargo binstall cargo-make
       - name: Run test
-        run: cargo test --all -- --nocapture
-
+        run: makers test --all -- --nocapture

@@ -13,11 +13,10 @@ pub struct AppConfig {
     pub google_map: GoogleMapConfig,
 }
 
-#[derive(Clone, Debug)]
-pub struct AppState {
+pub struct AppState<G> {
     pub config: AppConfig,
     pub chat_gpt_client: ChatGPT,
-    pub google_map_client: reqwest::Client,
+    pub google_map_client: G,
 }
 
 // TODO: 履歴を持つ場合はユーザ情報はDBで管理する
