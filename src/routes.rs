@@ -3,6 +3,7 @@ use crate::{
     output::routes::Output,
 };
 use axum::{extract::State, response::Json};
+use reqwest::Url;
 use std::sync::Arc;
 
 pub async fn get_routes<G: GoogleMapClient>(
@@ -12,19 +13,41 @@ pub async fn get_routes<G: GoogleMapClient>(
     let travel_mode = input.travel_mode.to_string();
     let dirs = state.google_map_client.routes(input.0).await?;
 
+    let err = Err(AppError {
+        message: "routes were not found".into(),
+    });
+
+    if dirs.routes.is_empty() {
+        eprintln!("route is empty");
+        return err;
+    }
+    if dirs.routes[0].legs.is_empty() {
+        eprintln!("legs is empty");
+        return err;
+    }
+
     let legs = &dirs.routes[0].legs;
     let origin = &legs[0].start_address;
     let destination = &legs[legs.len() - 1].end_address;
     let waypoints = legs[0..legs.len() - 1]
         .iter()
         .map(|leg| leg.end_address.clone())
-        .collect::<Vec<_>>()
-        .join("|");
+        .collect::<Vec<_>>();
 
-    let url = format!(
-        "https://www.google.com/maps/dir/?api=1&origin={}&destination={}&waypoints={}&travelmode={}",
-        origin, destination, waypoints, travel_mode
-    );
+    let mut queries = vec![
+        ("api", "1"),
+        ("origin", origin),
+        ("destination", destination),
+        ("mode", &travel_mode),
+    ];
+
+    let has_waypoints = !waypoints.is_empty();
+    let waypoints = waypoints.join("|");
+    if has_waypoints {
+        queries.push(("waypoints", &waypoints));
+    }
+
+    let url = Url::parse_with_params("https://www.google.com/maps/dir", &queries)?.to_string();
 
     let resp = Output {
         google_map_url: url,
@@ -64,8 +87,7 @@ mod tests {
             }
         }
     }
-    #[tokio::test]
-    async fn test_get_routes() -> anyhow::Result<()> {
+    async fn run_test(input: Input) -> anyhow::Result<StatusCode> {
         let config = config::AppConfig::try_parse()?;
         let token = config.open_chat.open_chat_api_key.clone();
         let bytes = include_bytes!("fixtures/directions.json");
@@ -84,13 +106,6 @@ mod tests {
         let app = Router::new()
             .route("/routes", post(get_routes))
             .with_state(Arc::clone(&state));
-
-        let input = Input {
-            origin: "大阪城".into(),
-            destination: "USJ".into(),
-            waypoints: vec!["道頓堀".into(), "通天閣".into(), "天保山".into()],
-            travel_mode: TravelMode::Driving,
-        };
         let json = serde_json::to_vec(&input)?;
         let body = Body::from(json);
 
@@ -101,8 +116,32 @@ mod tests {
             .body(body)?;
 
         let resp = app.oneshot(req).await?;
-        assert_eq!(resp.status(), StatusCode::OK);
+        Ok(resp.status())
+    }
 
+    #[tokio::test]
+    async fn test_get_routes_returns_all_routes() -> anyhow::Result<()> {
+        let input = Input {
+            origin: "大阪城".into(),
+            destination: "USJ".into(),
+            waypoints: vec!["道頓堀".into(), "通天閣".into(), "天保山".into()],
+            travel_mode: TravelMode::Driving,
+        };
+        let result = run_test(input).await?;
+        assert_eq!(result, StatusCode::OK);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn test_get_routes_returns_ok_when_request_no_waypoints() -> anyhow::Result<()> {
+        let input = Input {
+            origin: "大阪城".into(),
+            destination: "USJ".into(),
+            waypoints: vec![],
+            travel_mode: TravelMode::Driving,
+        };
+        let result = run_test(input).await?;
+        assert_eq!(result, StatusCode::OK);
         Ok(())
     }
 }
