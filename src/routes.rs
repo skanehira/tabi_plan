@@ -41,9 +41,10 @@ pub async fn get_routes<G: GoogleMapClient>(
         ("mode", &travel_mode),
     ];
 
-    let joined_waypoints = waypoints.join("|");
-    if !waypoints.is_empty() {
-        queries.push(("waypoints", &joined_waypoints));
+    let has_waypoints = waypoints.len() > 0;
+    let waypoints = waypoints.join("|");
+    if has_waypoints {
+        queries.push(("waypoints", &waypoints));
     }
 
     let url = Url::parse_with_params("https://www.google.com/maps/dir", &queries)?.to_string();
