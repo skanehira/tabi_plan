@@ -3,6 +3,7 @@ use crate::{
     output::routes::Output,
 };
 use axum::{extract::State, response::Json};
+use reqwest::Url;
 use std::sync::Arc;
 
 pub async fn get_routes<G: GoogleMapClient>(
@@ -33,18 +34,19 @@ pub async fn get_routes<G: GoogleMapClient>(
         .map(|leg| leg.end_address.clone())
         .collect::<Vec<_>>();
 
-    let url = if waypoints.is_empty() {
-        format!(
-            "https://www.google.com/maps/dir/?api=1&origin={}&destination={}&travelmode={}",
-            origin, destination, travel_mode
-        )
-    } else {
-        let waypoints = waypoints.join("|");
-        format!(
-        "https://www.google.com/maps/dir/?api=1&origin={}&destination={}&waypoints={}&travelmode={}",
-        origin, destination, waypoints, travel_mode
-        )
-    };
+    let mut queries = vec![
+        ("api", "1"),
+        ("origin", &origin),
+        ("destination", &destination),
+        ("mode", &travel_mode),
+    ];
+
+    let joined_waypoints = waypoints.join("|");
+    if !waypoints.is_empty() {
+        queries.push(("waypoints", &joined_waypoints));
+    }
+
+    let url = Url::parse_with_params("https://www.google.com/maps/dir", &queries)?.to_string();
 
     let resp = Output {
         google_map_url: url,
