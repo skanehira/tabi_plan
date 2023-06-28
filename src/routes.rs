@@ -31,7 +31,7 @@ pub async fn get_routes<G: GoogleMapClient>(
     let waypoints = legs[0..legs.len() - 1]
         .iter()
         .map(|leg| leg.end_address.clone())
-        .collect::<Vec<String>>();
+        .collect::<Vec<_>>();
 
     let url = if waypoints.is_empty() {
         format!(
